@@ -1,0 +1,13 @@
+  * {padding:0; margin:0;}
+  a {text-decoration:none;}
+  p {padding-left:10px;}
+  .container { margin-left:auto; margin-right:auto;}
+  .header {background-color:#441111}
+  .header h1 {color:white; line-height:80px;}
+  .header img {float:left; height:70px; width:100px; padding:5px; margin-right:20px}
+  .nav {background-color:#ffdd99; width:150px; float:left;}
+  .nav ul {margin:15px; list-style-type:none;}
+  .content {float:left; width:400px;}
+  .right {background-color:#bb9955; float:left; width:150px;}
+  .footer {clear:left; background-color:#bb9955;}
+  body{background-color:#6699CC;}
