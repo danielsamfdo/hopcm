@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Title goes here</title>
+  <title>Add New Members</title>
   <meta name="description" content="Description of your site goes here">
   <meta name="keywords" content="keyword1, keyword2, keyword3">
   <link href="css/style.css" rel="stylesheet" type="text/css">
@@ -12,7 +12,7 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', TRUE);
 ini_set('display_startup_errors', TRUE);
-  if(!empty($_SESSION['email'])){
+	if(!empty($_SESSION['email'])){
 ?>
 
 <body>
@@ -47,61 +47,82 @@ ini_set('display_startup_errors', TRUE);
  width="157"></div>
 <div class="welcome">
 <h1 class="title">Welcome <span><?php echo $_SESSION["name"]; ?></span></h1>
-<p><strong>Attendance Form</strong><br>
+<p><strong>Add a Zone</strong><br>
 </div>
 </div>
 <div class="row2">
-  <div class="members_listing">
+  <div class="add_zone">
 
     <?php
+      /* 
+       NEW.PHP
+       Allows user to create a new entry in the database
+      */
+      function renderForm($zonename,  $error)
+      {     
+         // if there are any errors, display them
+       if ($error != '')
+       {
+       echo '<div style="padding:4px; border:1px solid red; color:red;">'.$error.'</div>';
+       }
+       ?> 
+       <form action="" method="post">
+         <div class="add_zone">
+         <label>ZoneName: *</label> <input type="text" name="zonename" value="<?php echo $zonename; ?>" /><br/><br/>
+         <p>* required</p>
+         <br/>
+         <br/>
+         <input type="submit" name="submit" value="Submit">
+         </div>
+       </form> 
+       <?php 
+      }
+ 
+ 
+       
        include_once 'config.php';
        $con=mysql_connect(DB_HOST,DB_USER,DB_PASSWORD) or die("Failed to connect to Server: " . mysql_error()); 
        $db=mysql_select_db(DB_NAME,$con) or die("Failed to connect to DB " . mysql_error()); 
-       if(!empty($_POST['attendance_date']))
+       
+       // check if the form has been submitted. If it has, start to process the form and save it to the database
+       if (isset($_POST['submit']))
+       { 
+       // get form data, making sure it is valid
+       $zonename = mysql_real_escape_string(htmlspecialchars($_POST['zonename']));
+       
+       // check to make sure both fields are entered
+       if ($zonename == '')
        {
-       		$attendance_date = $_POST['attendance_date'];
-       		echo "Attendance on ". $attendance_date;
-
-			$result = mysql_query("SELECT * FROM Members where church_id = '$_SESSION[church_id]' ORDER BY dob asc") or die(mysql_error());         	 
-			echo "<form action='attendance_marking.php' method='post'>";
-			echo "<input type='hidden' name='attendance_date' value='". $attendance_date ."'>";
-      echo "<input type='text' name='event' value='Sunday Service'>";
-        	echo "<table>";
-        	$i = 1;
-			while($row = mysql_fetch_array( $result )) {
-		          // echo out the contents of each row into a table
-		          echo "<tr>";
-		          echo '<td>' . $row['name'] . '</td>';
-		          echo '<td>' . $row['gender'] . '</td>';
-		          $rslt = mysql_query("SELECT * FROM Attendance where church_id = '$_SESSION[church_id]' AND member_id='$row[member_id]' AND `date`='$attendance_date'")  or die(mysql_error());
-		          if (mysql_num_rows($rslt))
-		          	{
-		          		$check=1;
-		          	}
-		          else {
-		          		$check=0;
-		            }
-		          $ch_var = $check==1 ? 'checked' : '' ;
-		          echo '<td>' . "<input type='checkbox' value='". $row['member_id'] ."' name='present_". $i . "'" . $ch_var ." />" . '</td>';
-		          $i++;
-		          echo "</tr>"; 
-		        } 
-		        echo "<input type='hidden' name='count_of_rows' value='" . mysql_num_rows($result) . "' />";
-    	    // close table>
-	        echo "</table><input type='submit' />";
-	       echo "</form>";
+       // generate error message
+       $error = 'ERROR: Please fill in the required field!';
+       
+       // if either field is blank, display the form again
+       renderForm($zonename, $error);
        }
        else
        {
-       	header("Location: attendance_page.php");
+       $query = "INSERT zones SET zonename='$zonename', church_id='$_SESSION[church_id]' ";
+
+       // save the data to the database
+       mysql_query($query) or die(mysql_error()); 
+       
+       // once saved, redirect back to the view page
+       header("Location: view.php"); 
        }
-        echo "<form action='attendance_page.php' method='post'>";
-        echo "<label>Please Enter the date in which you want to view or mark Attendance </label>";
-        echo "<input type='date' name='attendance_date' />";
-        echo "<input type='submit' /> * Please Submit date first if the first selected date is wrong then Submit Attendance";
-        echo "</form>";
-    ?>
-    
+       }
+       else
+       // if the form hasn't been submitted, display the form
+       {
+       renderForm('', '');
+       }
+      ?>
+
+
+
+
+
+
+
   </div>
 </div>
 </div>
@@ -135,9 +156,9 @@ ini_set('display_startup_errors', TRUE);
 </div>
 </body>
 <?php }
-  else{
-    $url = "sign_in.html";
-      header("Location: $url");
-    }
-  ?>
+	else{
+		$url = "sign_in.html";
+   		header("Location: $url");
+   	}
+	?>
 </html>

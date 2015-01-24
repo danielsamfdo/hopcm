@@ -12,7 +12,7 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', TRUE);
 ini_set('display_startup_errors', TRUE);
-  if(!empty($_SESSION['email'])){
+	if(!empty($_SESSION['email'])){
 ?>
 
 <body>
@@ -47,7 +47,7 @@ ini_set('display_startup_errors', TRUE);
  width="157"></div>
 <div class="welcome">
 <h1 class="title">Welcome <span><?php echo $_SESSION["name"]; ?></span></h1>
-<p><strong>Attendance Form</strong><br>
+<p><strong>View Members</strong><br>
 </div>
 </div>
 <div class="row2">
@@ -57,51 +57,36 @@ ini_set('display_startup_errors', TRUE);
        include_once 'config.php';
        $con=mysql_connect(DB_HOST,DB_USER,DB_PASSWORD) or die("Failed to connect to Server: " . mysql_error()); 
        $db=mysql_select_db(DB_NAME,$con) or die("Failed to connect to DB " . mysql_error()); 
-       if(!empty($_POST['attendance_date']))
-       {
-       		$attendance_date = $_POST['attendance_date'];
-       		echo "Attendance on ". $attendance_date;
-
-			$result = mysql_query("SELECT * FROM Members where church_id = '$_SESSION[church_id]' ORDER BY dob asc") or die(mysql_error());         	 
-			echo "<form action='attendance_marking.php' method='post'>";
-			echo "<input type='hidden' name='attendance_date' value='". $attendance_date ."'>";
-      echo "<input type='text' name='event' value='Sunday Service'>";
-        	echo "<table>";
-        	$i = 1;
-			while($row = mysql_fetch_array( $result )) {
-		          // echo out the contents of each row into a table
-		          echo "<tr>";
-		          echo '<td>' . $row['name'] . '</td>';
-		          echo '<td>' . $row['gender'] . '</td>';
-		          $rslt = mysql_query("SELECT * FROM Attendance where church_id = '$_SESSION[church_id]' AND member_id='$row[member_id]' AND `date`='$attendance_date'")  or die(mysql_error());
-		          if (mysql_num_rows($rslt))
-		          	{
-		          		$check=1;
-		          	}
-		          else {
-		          		$check=0;
-		            }
-		          $ch_var = $check==1 ? 'checked' : '' ;
-		          echo '<td>' . "<input type='checkbox' value='". $row['member_id'] ."' name='present_". $i . "'" . $ch_var ." />" . '</td>';
-		          $i++;
-		          echo "</tr>"; 
-		        } 
-		        echo "<input type='hidden' name='count_of_rows' value='" . mysql_num_rows($result) . "' />";
-    	    // close table>
-	        echo "</table><input type='submit' />";
-	       echo "</form>";
-       }
-       else
-       {
-       	header("Location: attendance_page.php");
-       }
-        echo "<form action='attendance_page.php' method='post'>";
-        echo "<label>Please Enter the date in which you want to view or mark Attendance </label>";
-        echo "<input type='date' name='attendance_date' />";
-        echo "<input type='submit' /> * Please Submit date first if the first selected date is wrong then Submit Attendance";
-        echo "</form>";
-    ?>
+       $result = mysql_query("SELECT * FROM Members where church_id = '$_SESSION[church_id]' AND newcomer=true") or die(mysql_error());  
     
+        // display data in table
+        echo "<p><b>View All</b> | <a href='view-paginated-newcomer.php?page=1'>View Paginated</a></p>";
+        
+        echo "<table border='1' cellpadding='10'>";
+        echo "<tr><th>Name</th> <th>Gender</th> <th>DOB</th> <th>Contact Number</th> <th>Age</th> <th>Email</th> <th>Address</th> <th>Married</th> <th></th><th></th></tr>";
+
+        // loop through results of database query, displaying them in the table
+        while($row = mysql_fetch_array( $result )) {
+          
+          // echo out the contents of each row into a table
+          echo "<tr>";
+          echo '<td>' . $row['name'] . '</td>';
+          echo '<td>' . $row['gender'] . '</td>';
+          echo '<td>' . $row['dob'] . '</td>';
+          echo '<td>' . $row['contact_no'] . '</td>';
+          echo '<td>' . date_diff(date_create($row['dob']), date_create('today'))->y . '</td>';
+          echo '<td>' . $row['email'] . '</td>';
+          echo '<td>' . $row['residential_address'] . '</td>';
+          echo '<td>' . $row['maritial status'] . '</td>';
+          echo '<td><a href="move-to-member.php?id=' . $row['member_id'] . '">Add Permanent</a></td>';
+          echo '<td><a href="delete.php?id=' . $row['member_id'] . '">Delete</a></td>';
+          echo "</tr>"; 
+        } 
+
+        // close table>
+        echo "</table>";
+    ?>
+    <p><a href="new.php">Add a new record</a></p>
   </div>
 </div>
 </div>
@@ -135,9 +120,9 @@ ini_set('display_startup_errors', TRUE);
 </div>
 </body>
 <?php }
-  else{
-    $url = "sign_in.html";
-      header("Location: $url");
-    }
-  ?>
+	else{
+		$url = "sign_in.html";
+   		header("Location: $url");
+   	}
+	?>
 </html>

@@ -16,11 +16,7 @@
  $id = $_GET['id'];
  
  // delete the entry
- $result_ministry = mysql_query("DELETE FROM ministry WHERE member_id='$id' AND church_id='$_SESSION[church_id]'")
- or die(mysql_error()); 
- $result = mysql_query("DELETE FROM Members WHERE member_id='$id' AND church_id='$_SESSION[church_id]'")
- or die(mysql_error()); 
-
+ $result = mysql_query("Update Members SET newcomer='0' where member_id='$id' AND church_id='$_SESSION[church_id]'") or die(mysql_error()); 
  
  // redirect back to the view page
    header("Location: view.php");

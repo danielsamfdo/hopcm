@@ -2,3 +2,12 @@ CREATE TABLE WebsiteUsers ( userID int(9) NOT NULL auto_increment, name VARCHAR(
 CREATE TABLE Members(   `member_id` INT NOT NULL AUTO_INCREMENT,   `name` VARCHAR(75) NOT NULL,   `church_id` INT NOT NULL,   `contact_no` VARCHAR(50) NULL, `email` VARCHAR(100) NULL,  `residential_address` VARCHAR(500) NULL,   `company` VARCHAR(100) NULL,   `dob` DATE NOT NULL,   `maritial status` TINYINT(1) NOT NULL DEFAULT 0, `gender` VARCHAR(10) NOT NULL,  foreign key (church_id) references WebsiteUsers(userId),   PRIMARY KEY (`member_id`)   );
 CREATE TABLE Attendance(ID int(9) NOT NULL auto_increment, `date` DATE NOT NULL, church_id INT NOT NULL, member_id INT NOT NULL, foreign key (church_id) references WebsiteUsers(userId), foreign key (member_id) references Members(member_id),   PRIMARY KEY (ID));
 INSERT INTO `WebsiteUsers` (`userID`, `name`, `churchName`, `email`, `pass`, `status`, `pastorname`) VALUES ('5', 'admin', 'Test Church', 'Testmail@gmail.com', 'password', '2', 'TEST Pastor');
+ALTER TABLE `Members` ADD `newcomer` BOOLEAN NOT NULL DEFAULT FALSE ;
+ALTER TABLE `Members` ADD `annointing` BOOLEAN NOT NULL DEFAULT FALSE ;
+ALTER TABLE `Members` ADD `baptism` BOOLEAN NOT NULL DEFAULT FALSE ;
+CREATE TABLE zones ( id int(9) NOT NULL auto_increment, zonename VARCHAR(100) NOT NULL,`church_id` INT NOT NULL, foreign key (church_id) references WebsiteUsers(userId), PRIMARY KEY(id) );
+CREATE TABLE ministry ( id int(9) NOT NULL auto_increment, member_id int(9) NOT NULL, ministry_name VARCHAR(50) NOT NULL, church_id int(9) NOT NULL, foreign key (church_id) references WebsiteUsers(userId), foreign key (member_id) references Members(member_id) , PRIMARY KEY(id)); 
+ALTER TABLE ministry ADD zone_id INT NOT NULL;
+ALTER TABLE ministry ADD foreign key(zone_id) references zones(id);
+CREATE TABLE event(ID int(9) NOT NULL auto_increment, `event_date` DATE NOT NULL, event_name VARCHAR(200) NOT NULL, church_id INT NOT NULL, foreign key (church_id) references WebsiteUsers(userId), PRIMARY KEY(id))
+

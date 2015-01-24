@@ -54,11 +54,15 @@ ini_set('display_startup_errors', TRUE);
   <div class="add_member">
 
     <?php
+       include_once 'config.php';
+       $con=mysql_connect(DB_HOST,DB_USER,DB_PASSWORD) or die("Failed to connect to Server: " . mysql_error()); 
+       $db=mysql_select_db(DB_NAME,$con) or die("Failed to connect to DB " . mysql_error()); 
+       
       /* 
        NEW.PHP
        Allows user to create a new entry in the database
       */
-      function renderForm($name, $dob, $contact_no, $address, $company, $email, $gender, $maritial_status, $error, $id)
+      function renderForm($name, $dob, $contact_no, $address, $company, $email, $gender, $maritial_status, $newcomer, $baptism, $annointing, $zone_id, $ministry, $error, $id)
       {     
          // if there are any errors, display them
        if ($error != '')
@@ -66,19 +70,48 @@ ini_set('display_startup_errors', TRUE);
        echo '<div style="padding:4px; border:1px solid red; color:red;">'.$error.'</div>';
        }
        ?> 
-       <form action="" method="post">
+       <form action="" method="post" enctype="multipart/form-data">
          <input type="hidden" name="id" value="<?php echo $id; ?>"/>
          <div class="add_member">
+         <?php 
+         $q = mysql_query("SELECT * FROM Members where member_id='$id'"); 
+         
+         if($q && $row_member = mysql_fetch_array($q)){
+           if(!empty($row_member['image_url'])){
+              echo "<img src='uploads/" . $row_member['image_url'] . "' width='70px' height='70px'><br><br>";
+           }
+         }
+         ?>
+
+         <label>Image: </label><input type="file" name="fileToUpload" id="fileToUpload"><br><br>
          <label>Name: *</label> <input type="text" name="name" value="<?php echo $name; ?>" /><br/><br/>
          <label>Gender: *</label> <input type="radio" name="gender" value="male" <?php echo ($gender=='male')?'checked':'' ?> >Male <input type="radio" name="gender" value="female" <?php echo ($gender=='female')?'checked':'' ?> >Female<br/><br/>
+         <label>NewComer: *</label> <input type="radio" name="newcomer" value="1" <?php echo ($newcomer=='1')?'checked':'' ?> >Yes <input type="radio" name="newcomer" value=0 <?php echo ($newcomer=='0')?'checked':'' ?> >No.I am a Member<br/><br/>
          <label>DOB: *</label> <input type="date" name="dob" value="<?php echo $dob; ?>" /><br/><br/>
          <label>Email: </label> <input type="text" name="email" value="<?php echo $email; ?>" /><br/><br/>
          <label>Contact Number: *</label> <input type="text" name="contact_no" value="<?php echo $contact_no; ?>" /><br/><br/>
          <label>Residential Address: *</label> <input type="text" name="address" value="<?php echo $address; ?>" /><br/><br/>
          <label>Company: </label> <input type="text" name="company" value="<?php echo $company; ?>" /><br/><br/>
-         <label>Marital Status: *</label> <input type="radio" name="maritial_status" value='1' <?php echo ($maritial_status==1)?'checked':'' ?> > Married <input type="radio" name="maritial_status" value=0 <?php echo ($maritial_status=='0')?'checked':'' ?> > Unmarried<br/>
-         
-         
+         <label>Marital Status: *</label> <input type="radio" name="maritial_status" value='1' <?php echo ($maritial_status==1)?'checked':'' ?> > Married <input type="radio" name="maritial_status" value=0 <?php echo ($maritial_status=='0')?'checked':'' ?> > Unmarried<br/><br/>
+         <label>Baptism: *</label> <input type="radio" name="baptism" value='1' <?php echo ($baptism==1)?'checked':'' ?> > Yes <input type="radio" name="baptism" value=0 <?php echo ($baptism=='0')?'checked':'' ?> > No <br><br>
+         <label>Annointing: *</label> <input type="radio" name="annointing" value='1' <?php echo ($annointing==1)?'checked':'' ?> > Yes <input type="radio" name="annointing" value=0 <?php echo ($annointing=='0')?'checked':'' ?> > No <br><br>
+         <label>Zone: *</label>
+            <select name='zone'>
+              <?php 
+                $result_zones = mysql_query("SELECT * FROM zones where church_id = '$_SESSION[church_id]'") or die(mysql_error());  
+                while($row_zone = mysql_fetch_array( $result_zones )) {
+                  $s = $row_zone["id"]==$zone_id ? "selected" : "";
+                  echo "<option value='" . $row_zone["id"] . "'" .  $s . ">". $row_zone["zonename"] . "</option>" ;
+                }
+              ?>
+            </select><br><br><br>
+         <label>Ministry: *</label> <br>
+            <input type="checkbox" name="ministry[]" value="volunteer" <?php echo (in_array("volunteer", $ministry)) ? "checked" : "" ?> >volunteer<br>
+            <input type="checkbox" name="ministry[]" value="leader" <?php echo (in_array("leader", $ministry)) ? "checked" : "" ?> >leader<br>
+            <input type="checkbox" name="ministry[]" value="zonal leader" <?php echo (in_array("zonal leader", $ministry)) ? "checked" : "" ?> >zonal leader<br>
+            <input type="checkbox" name="ministry[]" value="none" <?php echo (in_array("none", $ministry)) ? "checked" : "" ?> >none<br>
+
+            <br><br><br>
          <p>* required</p>
          <br/>
          <br/>
@@ -90,9 +123,6 @@ ini_set('display_startup_errors', TRUE);
  
  
        
-       include_once 'config.php';
-       $con=mysql_connect(DB_HOST,DB_USER,DB_PASSWORD) or die("Failed to connect to Server: " . mysql_error()); 
-       $db=mysql_select_db(DB_NAME,$con) or die("Failed to connect to DB " . mysql_error()); 
        
        // check if the form has been submitted. If it has, start to process the form and save it to the database
        if (isset($_POST['submit']))
@@ -109,19 +139,82 @@ ini_set('display_startup_errors', TRUE);
            $company = $_POST['company'];
            $email = $_POST['email'];
            $id = $_POST['id'];
-           
-           // check to make sure both fields are entered
-           if ($name == '' || $dob == '' || $address == '' || $gender == '' || $maritial_status == '')
+           $newcomer = $_POST['newcomer'];
+           $baptism = $_POST['baptism'];
+           $annointing = $_POST['annointing'];
+           $zone_id = $_POST['zone'];
+           $ministry = $_POST['ministry'];
+           $target_dir = "uploads/";
+           $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
+           $uploadOk = 1;
+           $imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
+           $error = '';
+           if(!empty($_FILES["fileToUpload"]["tmp_name"])){
+             $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
+             $err = '';
+              if($check !== false) {
+                  echo "File is an image - " . $check["mime"] . ".";
+                  $uploadOk = 1;
+              } else {
+                  $err = "File is not an image.";
+                  $uploadOk = 0;
+              }
+              if (file_exists($target_file)) {
+                  $err = "Sorry, file already exists.";
+                  $uploadOk = 0;
+              }
+              if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+                && $imageFileType != "gif" ) {
+                    $err = "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+                    $uploadOk = 0;
+                }
+              if ($uploadOk == 0) {
+                  $error = $err . "Sorry, your file was not uploaded.";
+                  renderForm($name, $dob, $contact_no, $address, $company, $email, $gender, $maritial_status, $newcomer, $baptism, $annointing, $zone_id, $ministry, $error, $id);
+              }
+            }
+            if($uploadOk == 0 && !empty($_FILES["fileToUpload"]["tmp_name"])) 
+             {
+                //Dont do anything if file is wrong
+                renderForm($name, $dob, $contact_no, $address, $company, $email, $gender, $maritial_status, $newcomer, $baptism, $annointing, $zone_id, $ministry, $error, $id);
+             }
+           else if ($name == '' || $dob == '' || $address == '' || $gender == '' || $maritial_status == '' || $newcomer== '' || $baptism=='' || $annointing=='' || $zone_id=='' || sizeof($ministry)==0)
            {
            // generate error message
            $error = 'ERROR: Please fill in all required fields!';
            
-           // if either field is blank, display the form again
-           renderForm($name, $dob, $contact_no, $address, $company, $email, $gender, $maritial_status, $error, $id);
+           // if  field is blank, display the form again
+           renderForm($name, $dob, $contact_no, $address, $company, $email, $gender, $maritial_status, $newcomer, $baptism, $annointing, $zone_id, $ministry, $error, $id);
            }
            else
            {
-           $query = "UPDATE Members SET name='$name', dob='$dob', company='$company', email='$email', contact_no='$contact_no',  residential_address='$address', gender='$gender', `maritial status`='$maritial_status' where member_id='$id' ";
+            if(!empty($_FILES["fileToUpload"]["tmp_name"])){
+              if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
+              echo "The file ". basename( $_FILES["fileToUpload"]["name"]). " has been uploaded.";
+              $image_url = basename( $_FILES["fileToUpload"]["name"]);
+              $uploadOk = 2; 
+              } else {
+              echo "Sorry, there was an error uploading your file.";
+              $image_url = '';
+              $uploadOk = 0 ;
+              }
+            }
+            else
+              $image_url = '';
+
+           $query = "UPDATE Members SET name='$name', dob='$dob', company='$company', email='$email', contact_no='$contact_no',  residential_address='$address', gender='$gender', `maritial status`='$maritial_status',  `newcomer`='$newcomer', `baptism`='$baptism', `annointing`='$annointing', `zone_id`='$zone_id' ";
+           if($uploadOk == 2)
+            $query = $query . ", `image_url`='$image_url' ";
+           $query = $query . "where member_id='$id' " ;
+           echo $query . "\n\n\n\n";
+           $query_delete_ministry = mysql_query("DELETE FROM ministry WHERE member_id='$id' AND church_id='$_SESSION[church_id]'") or die(mysql_error()); 
+           for($i=0; $i<sizeof($ministry); $i++){
+             mysql_query("INSERT ministry set member_id='$id', ministry_name='$ministry[$i]', zone_id='$zone_id', church_id='$_SESSION[church_id]'"); 
+             if($ministry[$i] == 'zonal leader')
+             {
+
+             }
+            }
            // save the data to the database
            mysql_query($query) or die(mysql_error()); 
            
@@ -141,14 +234,16 @@ ini_set('display_startup_errors', TRUE);
            {
            // query db
              $id = $_GET['id'];
-             $result = mysql_query("SELECT * FROM Members WHERE member_id='$id' AND church_id='$_SESSION[church_id]'")
-             or die(mysql_error()); 
+             $result = mysql_query("SELECT * FROM Members WHERE member_id='$id' AND church_id='$_SESSION[church_id]'") or die(mysql_error()); 
+             
              $row = mysql_fetch_array($result);
              
              // check that the 'id' matches up with a row in the databse
              if($row)
              {
+             $result_ministry = mysql_query("SELECT * FROM ministry WHERE member_id='$id' AND church_id='$_SESSION[church_id]'") or die(mysql_error()); 
              
+
              // get data from db
              $name = $row['name'];
              $dob = $row['dob'];
@@ -159,9 +254,16 @@ ini_set('display_startup_errors', TRUE);
              $company = $row['company'];
              $email = $row['email'];
              $id = $row['member_id'];
-             
+             $newcomer = $row['newcomer'];
+             $baptism = $row['baptism'];
+             $annointing = $row['annointing'];
+             $zone_id = $row['zone_id'];
+             $ministry = array();
+             while($row_ministry = mysql_fetch_array( $result_ministry )) {
+              array_push($ministry, $row_ministry['ministry_name']);
+             }
              // show form
-             renderForm($name, $dob, $contact_no, $address, $company, $email, $gender, $maritial_status, '', $id);
+             renderForm($name, $dob, $contact_no, $address, $company, $email, $gender, $maritial_status, $newcomer, $baptism, $annointing, $zone_id, $ministry, '', $id);
              }
              else
              // if no match, display result

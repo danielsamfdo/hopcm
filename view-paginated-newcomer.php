@@ -12,7 +12,7 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', TRUE);
 ini_set('display_startup_errors', TRUE);
-	if(!empty($_SESSION['email'])){
+  if(!empty($_SESSION['email'])){
 ?>
 
 <body>
@@ -57,7 +57,7 @@ ini_set('display_startup_errors', TRUE);
        include_once 'config.php';
        $con=mysql_connect(DB_HOST,DB_USER,DB_PASSWORD) or die("Failed to connect to Server: " . mysql_error()); 
        $db=mysql_select_db(DB_NAME,$con) or die("Failed to connect to DB " . mysql_error()); 
-       $result = mysql_query("SELECT * FROM Members where church_id = '$_SESSION[church_id]'  AND newcomer='0'") or die(mysql_error());  
+       $result = mysql_query("SELECT * FROM Members where church_id = '$_SESSION[church_id]'  AND newcomer='1'") or die(mysql_error());  
        $per_page = 3;
        $total_results = mysql_num_rows($result);
        $total_pages = ceil($total_results / $per_page);
@@ -89,10 +89,10 @@ ini_set('display_startup_errors', TRUE);
         
         // display pagination
         
-        echo "<p><a href='view.php'>View All</a> | <b>View Page:</b> ";
+        echo "<p><a href='view-newcomer.php'>View All</a> | <b>View Page:</b> ";
         for ($i = 1; $i <= $total_pages; $i++)
         {
-          echo "<a href='view-paginated.php?page=$i'>$i</a> ";
+          echo "<a href='view-paginated-newcomer.php?page=$i'>$i</a> ";
         }
         echo "</p>";
           
@@ -116,7 +116,7 @@ ini_set('display_startup_errors', TRUE);
           echo '<td>' . mysql_result($result, $i, 'email') . '</td>';
           echo '<td>' . mysql_result($result, $i, 'residential_address') . '</td>';
           echo '<td>' . mysql_result($result, $i, 'maritial status') . '</td>';
-          echo '<td><a href="edit.php?id=' . mysql_result($result, $i, 'member_id') . '">Edit</a></td>';
+          echo '<td><a href="move-to-member.php?id=' . mysql_result($result, $i, 'member_id') . '">Add Permanent</a></td>';
           echo '<td><a href="delete.php?id=' . mysql_result($result, $i, 'member_id') . '">Delete</a></td>';
           echo "</tr>"; 
         }
@@ -160,9 +160,9 @@ ini_set('display_startup_errors', TRUE);
 </div>
 </body>
 <?php }
-	else{
-		$url = "sign_in.html";
-   		header("Location: $url");
-   	}
-	?>
+  else{
+    $url = "sign_in.html";
+      header("Location: $url");
+    }
+  ?>
 </html>

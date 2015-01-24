@@ -62,6 +62,9 @@ ini_set('display_startup_errors', TRUE);
           $attendance_date = $_POST["attendance_date"];
           if($_POST['count_of_rows'])
           { echo "No of ROWS". $_POST['count_of_rows'] ;
+            if(isset($_POST['event'])){
+              mysql_query("INSERT INTO event SET `event_date`='$attendance_date', church_id='$_SESSION[church_id]', event_name='$_POST[event]' ") or die(mysql_error());   
+            }
             $result = mysql_query("DELETE FROM Attendance WHERE `date`='$attendance_date' AND church_id='$_SESSION[church_id]'") or die(mysql_error()); 
             $cnt = $_POST['count_of_rows'];
             $i=1;

@@ -57,7 +57,7 @@ ini_set('display_startup_errors', TRUE);
        include_once 'config.php';
        $con=mysql_connect(DB_HOST,DB_USER,DB_PASSWORD) or die("Failed to connect to Server: " . mysql_error()); 
        $db=mysql_select_db(DB_NAME,$con) or die("Failed to connect to DB " . mysql_error()); 
-       $result = mysql_query("SELECT * FROM Members where church_id = '$_SESSION[church_id]'") or die(mysql_error());  
+       $result = mysql_query("SELECT * FROM Members where church_id = '$_SESSION[church_id]' AND newcomer='0'") or die(mysql_error());  
     
         // display data in table
         echo "<p><b>View All</b> | <a href='view-paginated.php?page=1'>View Paginated</a></p>";
