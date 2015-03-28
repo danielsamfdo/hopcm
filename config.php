@@ -9,4 +9,5 @@ define("DB_NAME", "hop_cm");    // The database name.
 
  
 define("SECURE", FALSE);    // FOR DEVELOPMENT ONLY!!!!
+
 ?>

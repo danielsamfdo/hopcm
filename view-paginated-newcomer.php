@@ -1,20 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Title goes here</title>
-  <meta name="description" content="Description of your site goes here">
-  <meta name="keywords" content="keyword1, keyword2, keyword3">
-  <link href="css/style.css" rel="stylesheet" type="text/css">
-</head>
 <?php 
 session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', TRUE);
 ini_set('display_startup_errors', TRUE);
-  if(!empty($_SESSION['email'])){
+  if(empty($_SESSION['email'])){
+    $url = "sign_in.html";
+    header("Location: $url");
+    }
+  else
+    {
 ?>
-
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>View Newcomers</title>
+  <meta name="description" content="Description of your site goes here">
+  <meta name="keywords" content="keyword1, keyword2, keyword3">
+  <link href="css/style.css" rel="stylesheet" type="text/css">
+</head>
 <body>
 <div class="main-out">
 <div class="main">
@@ -55,6 +59,7 @@ ini_set('display_startup_errors', TRUE);
 
     <?php
        include_once 'config.php';
+       include_once 'global_functions.php';
        $con=mysql_connect(DB_HOST,DB_USER,DB_PASSWORD) or die("Failed to connect to Server: " . mysql_error()); 
        $db=mysql_select_db(DB_NAME,$con) or die("Failed to connect to DB " . mysql_error()); 
        $result = mysql_query("SELECT * FROM Members where church_id = '$_SESSION[church_id]'  AND newcomer='1'") or die(mysql_error());  
@@ -98,7 +103,7 @@ ini_set('display_startup_errors', TRUE);
           
         // display data in table
         echo "<table border='1' cellpadding='10'>";
-        echo "<tr><th>Name</th> <th>Gender</th> <th>DOB</th> <th>Contact Number</th> <th>Age</th> <th>Email</th> <th>Address</th> <th>Married</th> <th></th><th></th></tr>";
+        echo "<tr><th>Name</th> <th>Gender</th> <th>DOB</th> <th>Contact Number</th> <th>Age</th> <th>Address</th> <th>Married</th> <th></th><th></th></tr>";
 
         // loop through results of database query, displaying them in the table 
         for ($i = $start; $i < $end; $i++)
@@ -110,12 +115,12 @@ ini_set('display_startup_errors', TRUE);
           echo "<tr>";
           echo '<td>' . mysql_result($result, $i, 'name') . '</td>';
           echo '<td>' . mysql_result($result, $i, 'gender') . '</td>';
-          echo '<td>' . mysql_result($result, $i, 'dob') . '</td>';
+          echo '<td>' . format_date(mysql_result($result, $i, 'dob')) . '</td>';
           echo '<td>' . mysql_result($result, $i, 'contact_no') . '</td>';
           echo '<td>' . date_diff(date_create(mysql_result($result, $i, 'dob')), date_create('today'))->y . '</td>';
-          echo '<td>' . mysql_result($result, $i, 'email') . '</td>';
+          //echo '<td>' . mysql_result($result, $i, 'email') . '</td>';
           echo '<td>' . mysql_result($result, $i, 'residential_address') . '</td>';
-          echo '<td>' . mysql_result($result, $i, 'maritial status') . '</td>';
+          echo '<td>' . yes_or_no(mysql_result($result, $i, 'maritial status')) . '</td>';
           echo '<td><a href="move-to-member.php?id=' . mysql_result($result, $i, 'member_id') . '">Add Permanent</a></td>';
           echo '<td><a href="delete.php?id=' . mysql_result($result, $i, 'member_id') . '">Delete</a></td>';
           echo "</tr>"; 
@@ -159,10 +164,5 @@ ini_set('display_startup_errors', TRUE);
 </div>
 </div>
 </body>
-<?php }
-  else{
-    $url = "sign_in.html";
-      header("Location: $url");
-    }
-  ?>
 </html>
+<?php } ?>

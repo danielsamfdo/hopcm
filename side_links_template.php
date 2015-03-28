@@ -8,5 +8,5 @@
   <li><a href="#">Link 7</a></li>
   <li><a href="#">Link 8</a></li>
   <li><a href="#">Link 9</a></li>
-  <li><a href="#">Link 10</a></li>
+  <li><a href="logout.php">Log out</a></li>
 </ul>

@@ -29,5 +29,4 @@ function NewUser()
    if(isset($_POST['submit'])) { SignUp(); } 
    $url = "sign_in.html";
    header("Location: $url");
-   ?>
-
+?>

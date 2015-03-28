@@ -1,20 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Title goes here</title>
-  <meta name="description" content="Description of your site goes here">
-  <meta name="keywords" content="keyword1, keyword2, keyword3">
-  <link href="css/style.css" rel="stylesheet" type="text/css">
-</head>
 <?php 
 session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', TRUE);
 ini_set('display_startup_errors', TRUE);
-  if(!empty($_SESSION['email'])){
+  if(empty($_SESSION['email'])){
+    $url = "sign_in.html";
+    header("Location: $url");
+    }
+  else
+    {
 ?>
-
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Attendance</title>
+  <meta name="description" content="Description of your site goes here">
+  <meta name="keywords" content="keyword1, keyword2, keyword3">
+  <link href="css/style.css" rel="stylesheet" type="text/css">
+</head>
 <body>
 <div class="main-out">
 <div class="main">
@@ -134,10 +138,5 @@ ini_set('display_startup_errors', TRUE);
 </div>
 </div>
 </body>
-<?php }
-  else{
-    $url = "sign_in.html";
-      header("Location: $url");
-    }
-  ?>
 </html>
+<?php }  ?>
