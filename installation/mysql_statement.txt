@@ -10,4 +10,4 @@ CREATE TABLE ministry ( id int(9) NOT NULL auto_increment, member_id int(9) NOT 
 ALTER TABLE ministry ADD zone_id INT NOT NULL;
 ALTER TABLE ministry ADD foreign key(zone_id) references zones(id);
 CREATE TABLE event(ID int(9) NOT NULL auto_increment, `event_date` DATE NOT NULL, event_name VARCHAR(200) NOT NULL, church_id INT NOT NULL, foreign key (church_id) references WebsiteUsers(userId), PRIMARY KEY(id))
-
+ALTER TABLE Members ADD joined_on DATE;

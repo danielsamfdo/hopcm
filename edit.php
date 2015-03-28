@@ -62,7 +62,7 @@ ini_set('display_startup_errors', TRUE);
        NEW.PHP
        Allows user to create a new entry in the database
       */
-      function renderForm($name, $dob, $contact_no, $address, $company, $email, $gender, $maritial_status, $newcomer, $baptism, $annointing, $zone_id, $ministry, $error, $id)
+      function renderForm($name, $dob, $contact_no, $address, $company, $email, $gender, $maritial_status, $newcomer, $baptism, $annointing, $zone_id, $ministry, $joined_on, $error, $id)
       {     
          // if there are any errors, display them
        if ($error != '')
@@ -87,6 +87,7 @@ ini_set('display_startup_errors', TRUE);
          <label>Name: *</label> <input type="text" name="name" value="<?php echo $name; ?>" /><br/><br/>
          <label>Gender: *</label> <input type="radio" name="gender" value="male" <?php echo ($gender=='male')?'checked':'' ?> >Male <input type="radio" name="gender" value="female" <?php echo ($gender=='female')?'checked':'' ?> >Female<br/><br/>
          <label>NewComer: *</label> <input type="radio" name="newcomer" value="1" <?php echo ($newcomer=='1')?'checked':'' ?> >Yes <input type="radio" name="newcomer" value=0 <?php echo ($newcomer=='0')?'checked':'' ?> >No.I am a Member<br/><br/>
+         <label>Joined on: </label> <input type="date" name="joined_on" value="<?php echo $joined_on; ?>" /><br/><br/>
          <label>DOB: *</label> <input type="date" name="dob" value="<?php echo $dob; ?>" /><br/><br/>
          <label>Email: </label> <input type="text" name="email" value="<?php echo $email; ?>" /><br/><br/>
          <label>Contact Number: *</label> <input type="text" name="contact_no" value="<?php echo $contact_no; ?>" /><br/><br/>
@@ -144,6 +145,7 @@ ini_set('display_startup_errors', TRUE);
            $annointing = $_POST['annointing'];
            $zone_id = $_POST['zone'];
            $ministry = $_POST['ministry'];
+           $joined_on = $_POST['joined_on'];
            $target_dir = "uploads/";
            $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
            $uploadOk = 1;
@@ -170,13 +172,13 @@ ini_set('display_startup_errors', TRUE);
                 }
               if ($uploadOk == 0) {
                   $error = $err . "Sorry, your file was not uploaded.";
-                  renderForm($name, $dob, $contact_no, $address, $company, $email, $gender, $maritial_status, $newcomer, $baptism, $annointing, $zone_id, $ministry, $error, $id);
+                  renderForm($name, $dob, $contact_no, $address, $company, $email, $gender, $maritial_status, $newcomer, $baptism, $annointing, $zone_id, $ministry, $joined_on, $error, $id);
               }
             }
             if($uploadOk == 0 && !empty($_FILES["fileToUpload"]["tmp_name"])) 
              {
                 //Dont do anything if file is wrong
-                renderForm($name, $dob, $contact_no, $address, $company, $email, $gender, $maritial_status, $newcomer, $baptism, $annointing, $zone_id, $ministry, $error, $id);
+                renderForm($name, $dob, $contact_no, $address, $company, $email, $gender, $maritial_status, $newcomer, $baptism, $annointing, $zone_id, $ministry, $joined_on, $error, $id);
              }
            else if ($name == '' || $dob == '' || $address == '' || $gender == '' || $maritial_status == '' || $newcomer== '' || $baptism=='' || $annointing=='' || $zone_id=='' || sizeof($ministry)==0)
            {
@@ -184,7 +186,7 @@ ini_set('display_startup_errors', TRUE);
            $error = 'ERROR: Please fill in all required fields!';
            
            // if  field is blank, display the form again
-           renderForm($name, $dob, $contact_no, $address, $company, $email, $gender, $maritial_status, $newcomer, $baptism, $annointing, $zone_id, $ministry, $error, $id);
+           renderForm($name, $dob, $contact_no, $address, $company, $email, $gender, $maritial_status, $newcomer, $baptism, $annointing, $zone_id, $ministry, $joined_on, $error, $id);
            }
            else
            {
@@ -202,7 +204,7 @@ ini_set('display_startup_errors', TRUE);
             else
               $image_url = '';
 
-           $query = "UPDATE Members SET name='$name', dob='$dob', company='$company', email='$email', contact_no='$contact_no',  residential_address='$address', gender='$gender', `maritial status`='$maritial_status',  `newcomer`='$newcomer', `baptism`='$baptism', `annointing`='$annointing', `zone_id`='$zone_id' ";
+           $query = "UPDATE Members SET name='$name', dob='$dob', company='$company', email='$email', contact_no='$contact_no',  residential_address='$address', gender='$gender', `maritial status`='$maritial_status',  `newcomer`='$newcomer', `baptism`='$baptism', `annointing`='$annointing', `zone_id`='$zone_id', `joined_on`='$joined_on' ";
            if($uploadOk == 2)
             $query = $query . ", `image_url`='$image_url' ";
            $query = $query . "where member_id='$id' " ;
@@ -262,8 +264,9 @@ ini_set('display_startup_errors', TRUE);
              while($row_ministry = mysql_fetch_array( $result_ministry )) {
               array_push($ministry, $row_ministry['ministry_name']);
              }
+             $joined_on = $row['joined_on'];
              // show form
-             renderForm($name, $dob, $contact_no, $address, $company, $email, $gender, $maritial_status, $newcomer, $baptism, $annointing, $zone_id, $ministry, '', $id);
+             renderForm($name, $dob, $contact_no, $address, $company, $email, $gender, $maritial_status, $newcomer, $baptism, $annointing, $zone_id, $ministry, $joined_on,  '', $id);
              }
              else
              // if no match, display result

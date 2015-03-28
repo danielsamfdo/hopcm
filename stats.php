@@ -66,7 +66,6 @@ ini_set('display_startup_errors', TRUE);
 
 
         if(isset($_POST['submit'])){
-          echo "Came in";
           $result_zones = mysql_query("SELECT * FROM zones where church_id = '$_SESSION[church_id]'") or die(mysql_error());            
           $zones = array();
           while($row = mysql_fetch_array( $result_zones ))
