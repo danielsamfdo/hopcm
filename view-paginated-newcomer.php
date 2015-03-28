@@ -122,7 +122,7 @@ ini_set('display_startup_errors', TRUE);
           echo '<td>' . mysql_result($result, $i, 'residential_address') . '</td>';
           echo '<td>' . yes_or_no(mysql_result($result, $i, 'maritial status')) . '</td>';
           echo '<td><a href="move-to-member.php?id=' . mysql_result($result, $i, 'member_id') . '">Add Permanent</a></td>';
-          echo '<td><a href="delete.php?id=' . mysql_result($result, $i, 'member_id') . '">Delete</a></td>';
+          echo '<td><a onclick="return confirm(\'Are you sure you want to delete this member?\')" href="delete.php?id=' . mysql_result($result, $i, 'member_id') . '">Delete</a></td>';
           echo "</tr>"; 
         }
         // close table>

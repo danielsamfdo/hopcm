@@ -84,7 +84,7 @@ ini_set('display_startup_errors', TRUE);
           echo '<td>' . $row['residential_address'] . '</td>';
           echo '<td>' . yes_or_no($row['maritial status']) . '</td>';
           echo '<td><a href="edit.php?id=' . $row['member_id'] . '">Edit</a></td>';
-          echo '<td><a href="delete.php?id=' . $row['member_id'] . '">Delete</a></td>';
+          echo '<td><a onclick="return confirm(\'Are you sure you want to delete this member?\')" href="delete.php?id=' . $row['member_id'] . '">Delete</a></td>';
           echo "</tr>"; 
         } 
 
