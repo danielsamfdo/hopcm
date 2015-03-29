@@ -9,6 +9,7 @@ ini_set('display_startup_errors', TRUE);
     }
   else
     {
+      ob_start();
 ?>
 <!DOCTYPE html>
 <html>
@@ -82,6 +83,7 @@ ini_set('display_startup_errors', TRUE);
               }
               $i+=1;
             }
+            ob_clean();
             header("Location: attendance.php");
           }
        }

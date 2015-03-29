@@ -1,5 +1,6 @@
 <?php 
 include_once 'config.php';
+ob_start();
 $con=mysql_connect(DB_HOST,DB_USER,DB_PASSWORD) or die("Failed to connect to MySQL: " . mysql_error()); 
 $db=mysql_select_db(DB_NAME,$con) or die("Failed to connect to MySQL: " . mysql_error()); 
 function NewUser() 
@@ -27,6 +28,7 @@ function NewUser()
   	}
    } 
    if(isset($_POST['submit'])) { SignUp(); } 
+   ob_clean();
    $url = "sign_in.html";
    header("Location: $url");
 ?>

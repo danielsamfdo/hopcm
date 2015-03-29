@@ -9,6 +9,7 @@ ini_set('display_startup_errors', TRUE);
     }
   else
     {
+      ob_start();
 ?>
 <!DOCTYPE html>
 <html>
@@ -109,7 +110,7 @@ ini_set('display_startup_errors', TRUE);
 
        // save the data to the database
        mysql_query($query) or die(mysql_error()); 
-       
+       ob_clean();
        // once saved, redirect back to the view page
        header("Location: view.php"); 
        }

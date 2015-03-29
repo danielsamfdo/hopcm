@@ -9,6 +9,7 @@ ini_set('display_startup_errors', TRUE);
     }
   else
     {
+      ob_start();
 ?>
 <!DOCTYPE html>
 <html>
@@ -219,7 +220,7 @@ ini_set('display_startup_errors', TRUE);
           mysql_query("INSERT ministry set member_id='$last_id', ministry_name='$ministry[$i]', zone_id='$zone_id', church_id='$_SESSION[church_id]'"); 
         }
        }
-       
+       ob_clean();
        // once saved, redirect back to the view page
        header("Location: view.php"); 
        }

@@ -9,6 +9,7 @@ ini_set('display_startup_errors', TRUE);
     }
   else
     {
+      ob_start();
 ?>
 <!DOCTYPE html>
 <html>
@@ -97,6 +98,7 @@ ini_set('display_startup_errors', TRUE);
        }
        else
        {
+        ob_clean();
        	header("Location: attendance_page.php");
        }
         echo "<form action='attendance_page.php' method='post'>";
